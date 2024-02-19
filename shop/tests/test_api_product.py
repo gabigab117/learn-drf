@@ -13,10 +13,11 @@ def test_product_list(active_product, inactive_product):
     response = client.get(reverse("product-list"))
     assert response.status_code == 200
     expected = {'count': 1, 'next': None, 'previous': None, 'results': [
-        {'id': 1, 'date_created': '2024-02-19T20:54:33.762681Z', 'date_updated': '2024-02-19T20:54:33.762695Z',
-         'name': 'Banane', 'category': 1}]}
-    del expected["results"][0]["date_created"], expected["results"][0]["date_updated"]
-    del response.json()["results"][0]["date_created"], response.json()["results"][0]["date_updated"]
+        {'id': active_product.id, 'date_created': format_datetime(active_product.date_created),
+         'date_updated': format_datetime(active_product.date_updated),
+         'name': active_product.name, 'category': active_product.category.id,
+         'articles': list(active_product.articles.filter(active=True))}]}
+
     assert response.json() == expected
 
 

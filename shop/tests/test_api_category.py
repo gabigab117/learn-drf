@@ -12,10 +12,9 @@ def test_category_list(active_category, inactive_category):
     response = client.get(reverse("category-list"))
     assert response.status_code == 200
     expected = {'count': 1, 'next': None, 'previous': None, 'results': [
-        {'id': 1, 'name': 'Fruits', 'date_created': '2024-02-19T20:52:33.337187Z',
-         'date_updated': '2024-02-19T20:52:33.337207Z', 'products': []}]}
-    del expected["results"][0]["date_created"], expected["results"][0]["date_updated"]
-    del response.json()["results"][0]["date_created"], response.json()["results"][0]["date_updated"]
+        {'id': active_category.id, 'name': active_category.name,
+         'date_created': format_datetime(active_category.date_created),
+         'date_updated': format_datetime(active_category.date_updated)}]}
     assert response.json() == expected
 
 
@@ -25,3 +24,13 @@ def test_create():
     response = client.post(reverse("category-list"))
     assert response.status_code == 405
     assert not Category.objects.exists()
+
+
+def test_detail(active_category):
+    response = client.get(reverse("category-detail", kwargs={"pk": active_category.id}))
+    assert response.status_code == 200
+    expected = {"id": active_category.id, "name": active_category.name,
+                "date_created": format_datetime(active_category.date_created),
+                "date_updated": format_datetime(active_category.date_updated),
+                "products": list(active_category.products.filter(active=True))}
+    assert response.json() == expected
