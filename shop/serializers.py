@@ -21,11 +21,17 @@ class CategoryDetailSerializer(ModelSerializer):
         # instance est l'instance de la catégorie
         # Si c'est une liste, méthode appelée autant de fois qu'il y a d'entités
         queryset = instance.products.filter(active=True)
-        serializer = ProductSerializer(queryset, many=True)
+        serializer = ProductListSerializer(queryset, many=True)
         return serializer.data
 
 
-class ProductSerializer(ModelSerializer):
+class ProductListSerializer(ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ["id", "date_created", "date_updated", "name", "category"]
+
+
+class ProductDetailSerializer(ModelSerializer):
     articles = SerializerMethodField()
 
     class Meta:

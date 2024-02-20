@@ -1,12 +1,14 @@
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from .models import Category, Product, Article
-from .serializers import CategoryDetailSerializer, ProductSerializer, ArticleSerializer, CategoryListSerializer
+from .serializers import CategoryDetailSerializer, ProductListSerializer, ArticleSerializer, CategoryListSerializer, \
+    ProductDetailSerializer
 
 
 # ReadOnly pour ne pas autoriser toutes les CRUD
 class CategoryViewset(ReadOnlyModelViewSet):
     serializer_class = CategoryListSerializer
     detail_serializer_class = CategoryDetailSerializer
+
     # queryset = ou méthode ci-dessous
 
     def get_queryset(self):
@@ -20,7 +22,8 @@ class CategoryViewset(ReadOnlyModelViewSet):
 
 
 class ProductViewset(ReadOnlyModelViewSet):
-    serializer_class = ProductSerializer
+    serializer_class = ProductListSerializer
+    detail_serializer_class = ProductDetailSerializer
 
     def get_queryset(self):
         queryset = Product.objects.filter(active=True)
@@ -28,6 +31,11 @@ class ProductViewset(ReadOnlyModelViewSet):
         if category_id:
             queryset = queryset.filter(category_id=category_id)
         return queryset
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return self.detail_serializer_class
+        return super().get_serializer_class()
 
 
 class ArticleViewset(ReadOnlyModelViewSet):
