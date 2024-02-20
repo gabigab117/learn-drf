@@ -15,8 +15,7 @@ def test_product_list(active_product, inactive_product):
     expected = {'count': 1, 'next': None, 'previous': None, 'results': [
         {'id': active_product.id, 'date_created': format_datetime(active_product.date_created),
          'date_updated': format_datetime(active_product.date_updated),
-         'name': active_product.name, 'category': active_product.category.id,
-         'articles': list(active_product.articles.filter(active=True))}]}
+         'name': active_product.name, 'category': active_product.category.id}]}
 
     assert response.json() == expected
 
@@ -42,3 +41,13 @@ def test_filter(active_product, active_product_2):
 
     assertContains(response, category_1_products_names[0])
     assertNotContains(response, category_2_products_names[0])
+
+
+def test_detail(active_product):
+    response = client.get(reverse("product-detail", kwargs={"pk": 1}))
+    assert response.status_code == 200
+    expected = {"id": active_product.pk, "date_created": format_datetime(active_product.date_created),
+                "date_updated": format_datetime(active_product.date_updated),
+                "name": active_product.name, "category": active_product.category.pk,
+                "articles": list(active_product.articles.filter(active=True))}
+    assert response.json() == expected
