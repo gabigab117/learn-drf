@@ -1,7 +1,10 @@
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from .models import Category, Product, Article
 from .serializers import CategoryDetailSerializer, ProductListSerializer, ArticleSerializer, CategoryListSerializer, \
     ProductDetailSerializer
+from django.db import transaction
 
 
 # ReadOnly pour ne pas autoriser toutes les CRUD
@@ -20,6 +23,13 @@ class CategoryViewset(ReadOnlyModelViewSet):
             return self.detail_serializer_class
         return super().get_serializer_class()
 
+    @action(detail=True, methods=['post'])
+    def disable(self, request, pk):
+        # post seulement
+        # détail car une catégorie
+        self.get_object().disable()
+        return Response()
+
 
 class ProductViewset(ReadOnlyModelViewSet):
     serializer_class = ProductListSerializer
@@ -36,6 +46,10 @@ class ProductViewset(ReadOnlyModelViewSet):
         if self.action == "retrieve":
             return self.detail_serializer_class
         return super().get_serializer_class()
+
+    @action(methods=["post"], detail=True)
+    def disable(self, request, pk):
+        self.get_object().disable()
 
 
 class ArticleViewset(ReadOnlyModelViewSet):
