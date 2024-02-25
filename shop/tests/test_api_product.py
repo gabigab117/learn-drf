@@ -1,21 +1,26 @@
 import pytest
+from unittest import mock
 from pytest_django.asserts import assertContains, assertNotContains
 from django.test import Client
 from django.urls import reverse
 
 from shop.models import Product
+from .mocks import mock_openfoodfact_success, ECOSCORE_GRADE
 from .utils import format_datetime
 
 client: Client = Client()
 
 
+@mock.patch("shop.models.Product.call_external_api", mock_openfoodfact_success)
+# Le premier paramètre est la méthode à mocker
+# Le second est le mock à appliquer
 def test_product_list(active_product, inactive_product):
     response = client.get(reverse("product-list"))
     assert response.status_code == 200
     expected = {'count': 1, 'next': None, 'previous': None, 'results': [
         {'id': active_product.id, 'date_created': format_datetime(active_product.date_created),
          'date_updated': format_datetime(active_product.date_updated),
-         'name': active_product.name, 'category': active_product.category.id}]}
+         'name': active_product.name, 'category': active_product.category.id, 'ecoscore': ECOSCORE_GRADE}]}
 
     assert response.json() == expected
 
@@ -34,6 +39,7 @@ def test_delete(active_product):
     assert response.status_code == 405
 
 
+@mock.patch("shop.models.Product.call_external_api", mock_openfoodfact_success)
 def test_filter(active_product, active_product_2):
     response = client.get(f"{reverse("product-list")}?category_id=1")
     category_1_products_names = [product.name for product in Product.objects.filter(active=True, category=1)]

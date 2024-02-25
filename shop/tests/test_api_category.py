@@ -14,7 +14,7 @@ def test_category_list(active_category, inactive_category):
     expected = {'count': 1, 'next': None, 'previous': None, 'results': [
         {'id': active_category.id, 'name': active_category.name,
          'date_created': format_datetime(active_category.date_created),
-         'date_updated': format_datetime(active_category.date_updated)}]}
+         'date_updated': format_datetime(active_category.date_updated), 'description': active_category.description}]}
     assert response.json() == expected
 
 
