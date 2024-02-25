@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from .models import Category, Product, Article
 
@@ -6,7 +7,18 @@ class CategoryListSerializer(ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ["id", "name", "date_created", "date_updated"]
+        fields = ["id", "name", "date_created", "date_updated", "description"]
+
+    def validate_name(self, value):
+        # Autant faire un unique=True dans lel modèle, mais bon c'est pour le fun
+        if Category.objects.filter(name=value).exists():
+            raise serializers.ValidationError("La catégorie existe déjà")
+        return value
+
+    def validate(self, data):
+        if data['name'] not in data["description"]:
+            raise serializers.ValidationError("Le nom doit être dans la description")
+        return data
 
 
 class CategoryDetailSerializer(ModelSerializer):
@@ -28,7 +40,7 @@ class CategoryDetailSerializer(ModelSerializer):
 class ProductListSerializer(ModelSerializer):
     class Meta:
         model = Product
-        fields = ["id", "date_created", "date_updated", "name", "category"]
+        fields = ["id", "date_created", "date_updated", "name", "category", "ecoscore"]
 
 
 class ProductDetailSerializer(ModelSerializer):
@@ -47,4 +59,14 @@ class ProductDetailSerializer(ModelSerializer):
 class ArticleSerializer(ModelSerializer):
     class Meta:
         model = Article
-        exclude = ["active"]
+        fields = ["name", "description", "active", "price", "product"]
+
+    def validate_price(self, value):
+        if value < 1:
+            raise serializers.ValidationError("Le prix doit être supérieur à 1e")
+        return value
+
+    def validate(self, data):
+        if not data["product"].active:
+            raise serializers.ValidationError("Le produit doit être actif")
+        return data
