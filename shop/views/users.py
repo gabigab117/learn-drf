@@ -1,10 +1,9 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from .models import Category, Product, Article
-from .serializers import CategoryDetailSerializer, ProductListSerializer, ArticleSerializer, CategoryListSerializer, \
+from shop.models import Category, Product, Article
+from shop.serializers import CategoryDetailSerializer, ProductListSerializer, ArticleSerializer, CategoryListSerializer, \
     ProductDetailSerializer
-from django.db import transaction
 
 
 # ReadOnly pour ne pas autoriser toutes les CRUD
