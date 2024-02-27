@@ -19,3 +19,7 @@ methods  est la liste des méthodes HTTP qui appellent cette action, parmi GET, 
 detail  est un booléen qui précise si l’action est disponible sur l’URL de liste ou de détail.
 
 url_path  permet de déterminer l’URL qui sera ajoutée à la fin de l'endpoint de liste ou de détail. S'il n’est pas précisé, alors le nom de la méthode est utilisé.
+
+# Permissions plus fines
+
+## Créer nos permissions

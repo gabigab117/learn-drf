@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from shop.serializers import CategoryDetailSerializer, CategoryListSerializer, ArticleSerializer
 from shop.models import Category, Article
+from shop.permissions import IsAdminAuthenticated
 
 
 # On va utiliser un ModelViewset car les admins peuvent tout voir
@@ -9,6 +10,7 @@ from shop.models import Category, Article
 class AdminCategoryViewset(ModelViewSet):
     serializer_class = CategoryListSerializer
     detail_serializer_class = CategoryDetailSerializer
+    permission_classes = [IsAdminAuthenticated]
 
     def get_queryset(self):
         return Category.objects.all()
